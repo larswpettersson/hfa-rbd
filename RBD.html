@@ -11,10 +11,19 @@
   <header class="app-header">
     <h1>Reliability Block Diagram</h1>
     <div class="toolbar">
-      <button id="add-component-btn" class="btn btn-primary">+ Add Component</button>
-      <button id="export-btn" class="btn">Export Diagram</button>
-      <button id="import-btn" class="btn">Import Diagram</button>
-      <input type="file" id="import-file" accept=".json" style="display:none;">
+      <!-- Diagram Type Selector -->
+      <div class="diagram-type-selector">
+        <button id="diagram-serial-btn" class="btn btn-diagram-type active" data-type="serial">Serial</button>
+        <button id="diagram-parallel-btn" class="btn btn-diagram-type" data-type="parallel">Parallel</button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="toolbar-actions">
+        <button id="add-component-btn" class="btn btn-primary">+ Add Component</button>
+        <button id="export-btn" class="btn">Export Diagram</button>
+        <button id="import-btn" class="btn">Import Diagram</button>
+        <input type="file" id="import-file" accept=".json" style="display:none;">
+      </div>
     </div>
   </header>
 

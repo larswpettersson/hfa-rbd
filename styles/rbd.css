@@ -132,7 +132,33 @@ input[readonly] {
   margin: 0 0 var(--gap-md) 0;
 }
 
+/* Design token for toolbar background */
+:root {
+  --color-toolbar-bg: #e6edf3;
+}
+
+body[data-theme="dark"] {
+  --color-toolbar-bg: #21262d;
+}
+
 .toolbar {
+  display: flex;
+  gap: var(--gap-md);
+  flex-wrap: wrap;
+  background-color: var(--color-toolbar-bg);
+  padding: var(--gap-sm) var(--gap-md);
+  border-radius: var(--radius-md);
+  align-items: center;
+}
+
+.diagram-type-selector {
+  display: flex;
+  gap: var(--gap-xs);
+  padding-right: var(--gap-md);
+  border-right: 1px solid var(--color-border);
+}
+
+.toolbar-actions {
   display: flex;
   gap: var(--gap-md);
   flex-wrap: wrap;
@@ -155,6 +181,30 @@ input[readonly] {
 }
 
 .btn-primary:hover {
+  background-color: #0860ca;
+}
+
+/* Diagram Type Selector Buttons */
+.btn-diagram-type {
+  background-color: var(--color-background-base);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-foreground);
+  font-weight: 500;
+  min-width: 70px;
+}
+
+.btn-diagram-type:hover {
+  background-color: var(--color-background-secondary);
+  border-color: var(--color-accent-primary);
+}
+
+.btn-diagram-type.active {
+  background-color: var(--color-accent-primary);
+  color: #ffffff;
+  border-color: var(--color-accent-primary);
+}
+
+.btn-diagram-type.active:hover {
   background-color: #0860ca;
 }
 
@@ -199,6 +249,18 @@ input[readonly] {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--gap-md);
   min-height: 200px;
+}
+
+.topology-badge {
+  grid-column: 1 / -1;
+  padding: var(--gap-sm) var(--gap-md);
+  background-color: rgba(9, 105, 218, 0.05);
+  border: 1px solid var(--color-accent-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--color-accent-primary);
+  text-align: center;
 }
 
 /* Component Card */

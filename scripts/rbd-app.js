@@ -12,7 +12,8 @@ let state = {
   meta: {
     title: "RBD Diagram",
     theme: "light",
-    seq: { component: 0 }
+    seq: { component: 0 },
+    diagramType: "serial"
   },
   components: [],
   connections: [],
@@ -152,18 +153,30 @@ function validateState(s) {
 }
 
 function calculateReliability(s) {
-  // For MVP: simple series calculation (R_sys = R1 * R2 * R3...)
-  // Each component's reliability is its availability
   let systemRel = 1.0;
+  const diagramType = s.meta.diagramType || "serial";
 
-  for (const comp of s.components) {
-    systemRel *= comp.reliability.availability;
+  if (diagramType === "serial") {
+    // Series: R_sys = R1 * R2 * R3... (all must work)
+    for (const comp of s.components) {
+      systemRel *= comp.reliability.availability;
+    }
+    s.computed = {
+      systemReliability: systemRel,
+      criticalPath: s.components.map(c => c.id)
+    };
+  } else if (diagramType === "parallel") {
+    // Parallel: R_sys = 1 - (1-R1)(1-R2)(1-R3)... (at least one must work)
+    let unreliability = 1.0;
+    for (const comp of s.components) {
+      unreliability *= (1 - comp.reliability.availability);
+    }
+    systemRel = 1 - unreliability;
+    s.computed = {
+      systemReliability: systemRel,
+      criticalPath: [] // In parallel, there's no single critical path
+    };
   }
-
-  s.computed = {
-    systemReliability: systemRel,
-    criticalPath: s.components.map(c => c.id)
-  };
 }
 
 // STATE MUTATION - commit() pattern
@@ -191,6 +204,20 @@ function render(s) {
 
 function renderComponentsGrid(s) {
   const container = document.getElementById("components-grid");
+  const diagramType = s.meta.diagramType || "serial";
+
+  // Add topology badge if there are components
+  let topologyBadge = container.querySelector(".topology-badge");
+  if (s.components.length > 0) {
+    if (!topologyBadge) {
+      topologyBadge = document.createElement("div");
+      topologyBadge.className = "topology-badge";
+      container.insertBefore(topologyBadge, container.firstChild);
+    }
+    topologyBadge.textContent = `${diagramType.charAt(0).toUpperCase() + diagramType.slice(1)} Configuration`;
+  } else if (topologyBadge) {
+    topologyBadge.remove();
+  }
 
   // Sync existing components
   s.components.forEach(comp => {
@@ -321,7 +348,13 @@ function renderSummary(s) {
   const sysRel = s.computed.systemReliability;
   sysAvail.textContent = `${(sysRel * 100).toFixed(2)}%`;
 
-  const pathStr = s.computed.criticalPath.join(" → ") || "--";
+  const diagramType = s.meta.diagramType || "serial";
+  let pathStr;
+  if (diagramType === "parallel") {
+    pathStr = s.components.length > 0 ? "Redundant" : "--";
+  } else {
+    pathStr = s.computed.criticalPath.join(" → ") || "--";
+  }
   critPath.textContent = pathStr;
 
   compCount.textContent = s.components.length;
@@ -401,6 +434,27 @@ function showMessage(text, type = "success") {
 // ============================================================
 
 function wireEventListeners() {
+  // Diagram type selector buttons
+  const diagramTypeButtons = document.querySelectorAll(".btn-diagram-type");
+  diagramTypeButtons.forEach(btn => {
+    btn.addEventListener("click", (evt) => {
+      const diagramType = evt.target.getAttribute("data-type");
+      if (diagramType && diagramType !== state.meta.diagramType) {
+        commit(s => {
+          s.meta.diagramType = diagramType;
+        });
+
+        // Update button active states
+        diagramTypeButtons.forEach(b => {
+          b.classList.toggle("active", b.getAttribute("data-type") === diagramType);
+        });
+
+        render(state);
+        showMessage(`Switched to ${diagramType} diagram mode`, "success");
+      }
+    });
+  });
+
   // Add component button
   document.getElementById("add-component-btn").addEventListener("click", () => {
     const name = prompt("Enter component name:");
