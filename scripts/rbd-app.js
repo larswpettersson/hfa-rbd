@@ -16,7 +16,10 @@ let state = {
     diagramType: "serial"
   },
   components: [],
-  connections: [],
+  topology: {
+    type: "serial",
+    groups: []
+  },
   computed: {
     systemReliability: 1.0,
     criticalPath: []
@@ -57,7 +60,18 @@ function addComponent(name, description = "") {
     domId: `comp-${state.meta.seq.component++}-${id}`
   };
 
-  commit(s => s.components.push(component));
+  commit(s => {
+    s.components.push(component);
+    // Add component to topology
+    if (s.topology.type === "serial") {
+      if (s.topology.groups.length === 0) {
+        s.topology.groups.push([]);
+      }
+      s.topology.groups[0].push(id);
+    } else if (s.topology.type === "parallel") {
+      s.topology.groups.push([id]);
+    }
+  });
   ui.selectedIds.clear();
   ui.selectedIds.add(id);
   render(state);
@@ -66,9 +80,10 @@ function addComponent(name, description = "") {
 function deleteComponent(componentId) {
   commit(s => {
     s.components = s.components.filter(c => c.id !== componentId);
-    s.connections = s.connections.filter(
-      conn => conn.fromComponentId !== componentId && conn.toComponentId !== componentId
-    );
+    // Remove from topology
+    s.topology.groups = s.topology.groups.map(group =>
+      group.filter(id => id !== componentId)
+    ).filter(group => group.length > 0);
   });
   ui.selectedIds.delete(componentId);
 }
@@ -198,6 +213,7 @@ function commit(mutator) {
 
 function render(s) {
   renderComponentsGrid(s);
+  renderConnectors(s);
   renderReliabilityPanel(s);
   renderSummary(s);
 }
@@ -360,6 +376,86 @@ function renderSummary(s) {
   compCount.textContent = s.components.length;
 }
 
+function renderConnectors(s) {
+  const canvas = document.getElementById("connectors-canvas");
+  const container = document.getElementById("components-grid");
+
+  if (!canvas || !container) return;
+
+  // Clear existing lines
+  canvas.querySelectorAll("line").forEach(line => line.remove());
+  canvas.querySelectorAll("text").forEach(text => text.remove());
+
+  // Set canvas size to match container
+  canvas.setAttribute("width", container.offsetWidth);
+  canvas.setAttribute("height", container.offsetHeight);
+
+  const diagramType = s.meta.diagramType || "serial";
+  const topology = s.topology;
+
+  if (diagramType === "serial" && topology.groups.length > 0) {
+    // Draw serial connectors: lines connecting components in sequence
+    const serialGroup = topology.groups[0];
+    for (let i = 0; i < serialGroup.length - 1; i++) {
+      const fromId = serialGroup[i];
+      const toId = serialGroup[i + 1];
+
+      const fromEl = document.getElementById(
+        s.components.find(c => c.id === fromId)?.domId
+      );
+      const toEl = document.getElementById(
+        s.components.find(c => c.id === toId)?.domId
+      );
+
+      if (!fromEl || !toEl) continue;
+
+      drawConnectorLine(fromEl, toEl, canvas, container);
+    }
+  } else if (diagramType === "parallel") {
+    // Draw parallel connectors: show parallel symbol on each component
+    for (const group of topology.groups) {
+      group.forEach(compId => {
+        const el = document.getElementById(
+          s.components.find(c => c.id === compId)?.domId
+        );
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          const x = rect.left - containerRect.left + 10;
+          const y = rect.top - containerRect.top + 10;
+
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("x", x);
+          text.setAttribute("y", y);
+          text.setAttribute("font-size", "10");
+          text.setAttribute("fill", "#8b949e");
+          text.textContent = "∥";
+          canvas.appendChild(text);
+        }
+      });
+    }
+  }
+}
+
+function drawConnectorLine(fromEl, toEl, canvas, container) {
+  const fromRect = fromEl.getBoundingClientRect();
+  const toRect = toEl.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  const x1 = fromRect.right - containerRect.left;
+  const y1 = fromRect.top - containerRect.top + fromRect.height / 2;
+  const x2 = toRect.left - containerRect.left;
+  const y2 = toRect.top - containerRect.top + toRect.height / 2;
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x1);
+  line.setAttribute("y1", y1);
+  line.setAttribute("x2", x2);
+  line.setAttribute("y2", y2);
+
+  canvas.appendChild(line);
+}
+
 // PERSISTENCE
 // ============================================================
 
@@ -399,6 +495,14 @@ function importState(file) {
           throw new Error(`Component ${comp.id}: missing reliability data`);
         }
       });
+
+      // Ensure topology exists
+      if (!imported.topology) {
+        imported.topology = {
+          type: imported.meta?.diagramType || "serial",
+          groups: []
+        };
+      }
 
       // Reset UI state and load new state
       state = imported;
@@ -442,6 +546,18 @@ function wireEventListeners() {
       if (diagramType && diagramType !== state.meta.diagramType) {
         commit(s => {
           s.meta.diagramType = diagramType;
+          s.topology.type = diagramType;
+
+          // Reorganize topology groups based on new diagram type
+          if (diagramType === "serial") {
+            // Flatten all components into a single serial group
+            const allIds = s.topology.groups.flat();
+            s.topology.groups = allIds.length > 0 ? [allIds] : [];
+          } else if (diagramType === "parallel") {
+            // Each component becomes its own parallel group
+            const allIds = s.topology.groups.flat();
+            s.topology.groups = allIds.map(id => [id]);
+          }
         });
 
         // Update button active states

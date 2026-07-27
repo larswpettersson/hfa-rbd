@@ -244,11 +244,34 @@ body[data-theme="dark"] {
   margin-top: 0;
 }
 
+.grid-wrapper {
+  position: relative;
+}
+
+.connectors-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.connectors-canvas line {
+  stroke: var(--color-foreground-secondary);
+  stroke-width: 2;
+  stroke-dasharray: 4, 2;
+  opacity: 0.6;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--gap-md);
   min-height: 200px;
+  position: relative;
+  z-index: 2;
 }
 
 .topology-badge {
