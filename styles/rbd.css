@@ -303,9 +303,10 @@ body[data-theme="dark"] {
 }
 
 .component-card.is-selected {
-  border-color: var(--color-accent-primary);
-  background-color: rgba(9, 105, 218, 0.05);
-  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+  background-color: var(--color-background-base);
+  border-color: var(--color-foreground);
+  border-width: 1px;
+  box-shadow: 4px 4px 4px rgba(13, 17, 23, 0.4);
 }
 
 .component-card .id-tag {
