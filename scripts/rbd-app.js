@@ -289,11 +289,20 @@ function createComponentCardElement(component) {
   el.id = component.domId;
   el.setAttribute("data-component-id", component.id);
 
+  // Header: ID tag
+  const header = document.createElement("div");
+  header.className = "card-header";
+
   const idTag = document.createElement("div");
   idTag.className = "id-tag";
   idTag.setAttribute("data-role", "id");
   idTag.textContent = component.id;
   idTag.setAttribute("data-field", "id");
+  header.appendChild(idTag);
+
+  // Body: Name and summary in flex column
+  const body = document.createElement("div");
+  body.className = "card-body";
 
   const nameTag = document.createElement("h3");
   nameTag.className = "name";
@@ -304,7 +313,9 @@ function createComponentCardElement(component) {
   const summary = document.createElement("div");
   summary.className = "reliability-summary";
 
-  el.append(idTag, nameTag, summary);
+  body.append(nameTag, summary);
+
+  el.append(header, body);
   return el;
 }
 
