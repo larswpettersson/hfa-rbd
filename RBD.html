@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBD - Reliability Block Diagram</title>
+  <link rel="stylesheet" href="styles/rbd.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <h1>Reliability Block Diagram</h1>
+    <div class="toolbar">
+      <button id="add-component-btn" class="btn btn-primary">+ Add Component</button>
+      <button id="export-btn" class="btn">Export Diagram</button>
+      <button id="import-btn" class="btn">Import Diagram</button>
+      <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Components Grid -->
+    <section class="components-section">
+      <h2>Components</h2>
+      <div id="components-grid" class="grid-container"></div>
+    </section>
+
+    <!-- Reliability Panel -->
+    <aside class="reliability-panel">
+      <h3>Reliability Values</h3>
+      <div id="no-selection" class="empty-state">
+        <p>Select a component to view/edit reliability values</p>
+      </div>
+      <div id="reliability-fields" style="display: none;">
+        <div class="field-group">
+          <label>Failure Rate (failures/hour)</label>
+          <input type="number" id="field-failure-rate" step="0.0001" min="0" placeholder="0.001" data-field="failureRate">
+        </div>
+        <div class="field-group">
+          <label>MTTF (hours)</label>
+          <div class="readonly-field" id="field-mttf">--</div>
+          <small>Calculated from failure rate (1 / failure rate)</small>
+        </div>
+        <div class="field-group">
+          <label>Availability (%)</label>
+          <input type="number" id="field-availability" min="0" max="100" step="0.01" placeholder="99.9" data-field="availability">
+        </div>
+        <div class="field-group">
+          <label>Confidence Level (%)</label>
+          <input type="number" id="field-confidence" min="0" max="100" step="1" placeholder="80" data-field="confidence">
+        </div>
+      </div>
+    </aside>
+
+    <!-- System Reliability Summary -->
+    <section class="summary-section">
+      <h3>System Reliability</h3>
+      <div id="system-reliability-display">
+        <div class="metric">
+          <label>System Availability:</label>
+          <strong id="sys-availability">--</strong>
+        </div>
+        <div class="metric">
+          <label>Critical Path:</label>
+          <span id="critical-path">--</span>
+        </div>
+        <div class="metric">
+          <label>Components:</label>
+          <span id="component-count">0</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Message Toast -->
+  <div id="message-toast" class="message-toast"></div>
+
+  <script src="scripts/rbd-app.js"></script>
+</body>
+</html>
