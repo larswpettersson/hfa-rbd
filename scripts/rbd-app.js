@@ -553,7 +553,7 @@ function wireEventListeners() {
   const diagramTypeButtons = document.querySelectorAll(".btn-diagram-type");
   diagramTypeButtons.forEach(btn => {
     btn.addEventListener("click", (evt) => {
-      const diagramType = evt.target.getAttribute("data-type");
+      const diagramType = evt.currentTarget.getAttribute("data-type");
       if (diagramType && diagramType !== state.meta.diagramType) {
         commit(s => {
           s.meta.diagramType = diagramType;

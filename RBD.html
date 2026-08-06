@@ -7,83 +7,127 @@
   <link rel="stylesheet" href="styles/rbd.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="app-header">
-    <h1>Reliability Block Diagram</h1>
-    <div class="toolbar">
-      <!-- Diagram Type Selector -->
-      <div class="diagram-type-selector">
-        <button id="diagram-serial-btn" class="btn btn-diagram-type active" data-type="serial">Serial</button>
-        <button id="diagram-parallel-btn" class="btn btn-diagram-type" data-type="parallel">Parallel</button>
+  <!-- UI Shell: Library | Canvas | Analysis -->
+  <div class="ui-shell">
+
+    <!-- Panel / Library -->
+    <aside class="panel panel-library">
+      <!-- RBD Toolbar -->
+      <div class="rbd-toolbar">
+        <button id="diagram-serial-btn" class="action-button btn-diagram-type active" data-type="serial">
+          <span class="prefix">+</span><span class="label">Serial</span>
+        </button>
+        <button id="diagram-parallel-btn" class="action-button btn-diagram-type" data-type="parallel">
+          <span class="prefix">+</span><span class="label">Parallell</span>
+        </button>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="toolbar-actions">
-        <button id="add-component-btn" class="btn btn-primary">+ Add Component</button>
-        <button id="export-btn" class="btn">Export Diagram</button>
-        <button id="import-btn" class="btn">Import Diagram</button>
-        <input type="file" id="import-file" accept=".json" style="display:none;">
+      <div class="rbd-toolbar rbd-toolbar-secondary">
+        <button id="add-component-btn" class="action-button action-button-primary">
+          <span class="prefix">+</span><span class="label">Component</span>
+        </button>
+        <button id="export-btn" class="action-button">Export</button>
+        <button id="import-btn" class="action-button">Import</button>
+        <input type="file" id="import-file" accept=".json" hidden>
       </div>
-    </div>
-  </header>
 
-  <!-- Main Content -->
-  <main class="app-main">
-    <!-- Components Grid -->
-    <section class="components-section">
-      <h2>Components</h2>
-      <div class="grid-wrapper">
-        <svg id="connectors-canvas" class="connectors-canvas"></svg>
-        <div id="components-grid" class="grid-container"></div>
-      </div>
-    </section>
+      <h2 class="panel-heading panel-heading-sm">Library</h2>
 
-    <!-- Reliability Panel -->
-    <aside class="reliability-panel">
-      <h3>Reliability Values</h3>
-      <div id="no-selection" class="empty-state">
-        <p>Select a component to view/edit reliability values</p>
-      </div>
-      <div id="reliability-fields" style="display: none;">
-        <div class="field-group">
-          <label>Failure Rate (failures/hour)</label>
-          <input type="number" id="field-failure-rate" step="0.0001" min="0" placeholder="0.001" data-field="failureRate">
-        </div>
-        <div class="field-group">
-          <label>MTTF (hours)</label>
-          <div class="readonly-field" id="field-mttf">--</div>
-          <small>Calculated from failure rate (1 / failure rate)</small>
-        </div>
-        <div class="field-group">
-          <label>Availability (%)</label>
-          <input type="number" id="field-availability" min="0" max="100" step="0.01" placeholder="99.9" data-field="availability">
-        </div>
-        <div class="field-group">
-          <label>Confidence Level (%)</label>
-          <input type="number" id="field-confidence" min="0" max="100" step="1" placeholder="80" data-field="confidence">
-        </div>
+      <div class="library-blocks">
+        <article class="rbd-block">
+          <div class="rbd-block-name">Pump A</div>
+          <div class="rbd-block-mtbf">MTBF: 100 000 h</div>
+          <div class="rbd-block-rate">&lambda; = 1,0 &times; 10&#8315;&#8309; /h</div>
+        </article>
+        <article class="rbd-block">
+          <div class="rbd-block-name">Pump A</div>
+          <div class="rbd-block-mtbf">MTBF: 100 000 h</div>
+          <div class="rbd-block-rate">&lambda; = 1,0 &times; 10&#8315;&#8309; /h</div>
+        </article>
+        <article class="rbd-block is-selected">
+          <div class="rbd-block-name">Pump A</div>
+          <div class="rbd-block-mtbf">MTBF: 100 000 h</div>
+          <div class="rbd-block-rate">&lambda; = 1,0 &times; 10&#8315;&#8309; /h</div>
+        </article>
       </div>
     </aside>
 
-    <!-- System Reliability Summary -->
-    <section class="summary-section">
-      <h3>System Reliability</h3>
-      <div id="system-reliability-display">
-        <div class="metric">
-          <label>System Availability:</label>
-          <strong id="sys-availability">--</strong>
+    <!-- Canvas / RBD Work Area -->
+    <main class="canvas">
+      <section class="example-stack">
+        <div class="grid-wrapper">
+          <svg id="connectors-canvas" class="connectors-canvas"></svg>
+          <div id="components-grid" class="grid-container"></div>
         </div>
-        <div class="metric">
-          <label>Critical Path:</label>
-          <span id="critical-path">--</span>
+        <p class="stack-caption">Example: 3&times; parallel Pump A &mdash; 2/3 majority vote (M/N)</p>
+      </section>
+    </main>
+
+    <!-- Panel / Analysis -->
+    <aside class="panel panel-analysis">
+      <h2 class="panel-heading">Analysis</h2>
+
+      <section class="analysis-section">
+        <h3 class="analysis-heading">Reliability values</h3>
+        <div id="no-selection" class="empty-state">
+          <p>Select a component to view/edit reliability values</p>
         </div>
-        <div class="metric">
-          <label>Components:</label>
-          <span id="component-count">0</span>
+        <div id="reliability-fields" style="display: none;">
+          <div class="field-group">
+            <label>Failure Rate (failures/hour)</label>
+            <input type="number" id="field-failure-rate" step="0.0001" min="0" placeholder="0.001" data-field="failureRate">
+          </div>
+          <div class="field-group">
+            <label>MTTF (hours)</label>
+            <div class="readonly-field" id="field-mttf">--</div>
+            <small>Calculated from failure rate (1 / failure rate)</small>
+          </div>
+          <div class="field-group">
+            <label>Availability (%)</label>
+            <input type="number" id="field-availability" min="0" max="100" step="0.01" placeholder="99.9" data-field="availability">
+          </div>
+          <div class="field-group">
+            <label>Confidence Level (%)</label>
+            <input type="number" id="field-confidence" min="0" max="100" step="1" placeholder="80" data-field="confidence">
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+
+      <section class="analysis-section">
+        <h3 class="analysis-heading">System reliability</h3>
+        <div id="system-reliability-display">
+          <div class="metric">
+            <label>System Availability:</label>
+            <strong id="sys-availability">--</strong>
+          </div>
+          <div class="metric">
+            <label>Critical Path:</label>
+            <span id="critical-path">--</span>
+          </div>
+          <div class="metric">
+            <label>Components:</label>
+            <span id="component-count">0</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="analysis-section">
+        <h3 class="analysis-heading">M/N stage (selected)</h3>
+        <p class="analysis-detail">Structure: 2-of-3 (majority vote)<br>
+          M = 2, N = 3<br>
+          Boolean: (A&cap;B) &cup; (A&cap;C) &cup; (B&cap;C)</p>
+        <p class="analysis-detail">At least M of N parallel blocks must succeed for the stage to be Up.
+          Success-based (RBD), not failure-based (FTA K/N).</p>
+      </section>
+
+      <section class="analysis-section">
+        <h3 class="analysis-heading">Bridge (complex)</h3>
+        <p class="analysis-detail">A is a cross-connection (bridge) between upper (B1&rarr;C1) and lower (B2&rarr;C2)
+          branches. Input splits only to B1 and B2.</p>
+      </section>
+    </aside>
+
+  </div>
 
   <!-- Message Toast -->
   <div id="message-toast" class="message-toast"></div>

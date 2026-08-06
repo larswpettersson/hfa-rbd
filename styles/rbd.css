@@ -12,8 +12,17 @@
   --color-status-warning: #9e6a03;
   --color-status-error: #da3633;
 
+  /* UI Shell (Penpot "UI Shell" board) */
+  --color-panel-bg: #e6edf3;
+  --color-canvas-bg: #f0f6fc;
+  --color-block-bg: #f0f6fc;
+  --color-block-border: #0d1117;
+  --color-block-selected-bg: #ffe5e5;
+  --color-foreground-muted: #8b949e;
+  --panel-width: 300px;
+
   /* Typography */
-  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+  --font-family-base: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif;
   --font-size-base: 14px;
   --font-size-small: 12px;
   --font-size-large: 16px;
@@ -45,6 +54,13 @@ body[data-theme="dark"] {
   --color-foreground: #c9d1d9;
   --color-foreground-secondary: #8b949e;
   --color-border: #30363d;
+
+  --color-panel-bg: #161b22;
+  --color-canvas-bg: #0d1117;
+  --color-block-bg: #161b22;
+  --color-block-border: #30363d;
+  --color-block-selected-bg: #3d1f21;
+  --color-foreground-muted: #6e7681;
 }
 
 /* Global Styles */
@@ -120,128 +136,204 @@ input[readonly] {
   opacity: 0.6;
 }
 
-/* Header */
-.app-header {
-  background-color: var(--color-background-secondary);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--gap-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.app-header h1 {
-  margin: 0 0 var(--gap-md) 0;
-}
-
-/* Design token for toolbar background */
-:root {
-  --color-toolbar-bg: #e6edf3;
-}
-
-body[data-theme="dark"] {
-  --color-toolbar-bg: #21262d;
-}
-
-.toolbar {
+/* UI Shell - three columns: Library | Canvas | Analysis */
+.ui-shell {
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  min-height: 100vh;
+}
+
+/* Side Panels */
+.panel {
+  flex: 0 0 var(--panel-width);
+  width: var(--panel-width);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--gap-md);
-  flex-wrap: wrap;
-  background-color: var(--color-toolbar-bg);
-  padding: var(--gap-sm) var(--gap-md);
-  border-radius: var(--radius-md);
+  padding: var(--gap-lg);
+  background-color: var(--color-panel-bg);
+  overflow-y: auto;
+}
+
+.panel-heading {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.panel-heading-sm {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+/* RBD Toolbar */
+.rbd-toolbar {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-}
-
-.diagram-type-selector {
-  display: flex;
-  gap: var(--gap-xs);
-  padding-right: var(--gap-md);
-  border-right: 1px solid var(--color-border);
-}
-
-.toolbar-actions {
-  display: flex;
-  gap: var(--gap-md);
   flex-wrap: wrap;
+  gap: var(--gap-sm);
+  padding: var(--gap-md);
+  border-radius: var(--radius-md);
+  background-color: var(--color-panel-bg);
 }
 
-.btn {
-  background-color: var(--color-background-base);
+.rbd-toolbar-secondary {
+  padding-top: 0;
+}
+
+/* Action Button */
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--gap-sm) 10px;
+  font-size: var(--font-size-large);
+  font-weight: 400;
   color: var(--color-foreground);
-  border: 1px solid var(--color-foreground);
+  background-color: var(--color-block-bg);
+  border: 1px solid var(--color-block-border);
+  border-radius: 6px;
 }
 
-.btn:hover {
-  background-color: var(--color-background-secondary);
+.action-button .label {
+  text-decoration: underline;
 }
 
-.btn-primary {
+.action-button:hover {
+  border-color: var(--color-accent-primary);
+}
+
+.action-button-primary {
   background-color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
   color: #ffffff;
-  border-color: var(--color-accent-primary);
 }
 
-.btn-primary:hover {
+.action-button-primary:hover {
   background-color: #0860ca;
+  border-color: #0860ca;
 }
 
-/* Diagram Type Selector Buttons */
-.btn-diagram-type {
-  background-color: var(--color-background-base);
-  color: var(--color-foreground);
-  border: 1px solid var(--color-foreground);
-  font-weight: 500;
-  min-width: 70px;
-}
-
-.btn-diagram-type:hover {
-  background-color: var(--color-background-secondary);
-  border-color: var(--color-accent-primary);
-}
-
+/* Keeps the design's flat toolbar look; active state reads as emphasis, not a filled button */
 .btn-diagram-type.active {
-  background-color: var(--color-accent-primary);
-  color: #ffffff;
   border-color: var(--color-accent-primary);
+  box-shadow: inset 0 0 0 1px var(--color-accent-primary);
+  font-weight: 600;
 }
 
-.btn-diagram-type.active:hover {
-  background-color: #0860ca;
+/* Library palette blocks */
+.library-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
 }
 
-/* Main Layout */
-.app-main {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  grid-template-rows: auto auto;
-  gap: var(--gap-lg);
-  padding: var(--gap-lg);
-  max-width: 1400px;
-  margin: 0 auto;
+.rbd-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+  min-width: 140px;
+  width: fit-content;
+  white-space: nowrap;
+  padding: 12px;
+  background-color: var(--color-block-bg);
+  border: 1px solid var(--color-block-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-large);
+  line-height: 1.25;
+}
+
+.rbd-block.is-selected {
+  background-color: var(--color-block-selected-bg);
+}
+
+.rbd-block.is-selected .rbd-block-name {
+  font-weight: 600;
+}
+
+.rbd-block-name {
+  color: var(--color-foreground);
+}
+
+.rbd-block-mtbf {
+  color: var(--color-foreground-secondary);
+}
+
+.rbd-block-rate {
+  color: var(--color-foreground-muted);
+}
+
+/* Canvas / RBD Work Area */
+.canvas {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 64px;
+  padding: 48px;
+  background-color: var(--color-canvas-bg);
+  overflow: auto;
+}
+
+.example-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.example-stack .grid-wrapper {
+  width: 100%;
+}
+
+.stack-caption {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-foreground-secondary);
+}
+
+/* Analysis Panel */
+.analysis-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.analysis-heading {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.analysis-detail {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--color-foreground-secondary);
 }
 
 @media (max-width: 1024px) {
-  .app-main {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+  .ui-shell {
+    flex-direction: column;
   }
 
-  .reliability-panel {
-    grid-column: 1;
+  .panel {
+    flex: 0 0 auto;
+    width: auto;
   }
 
-  .summary-section {
-    grid-column: 1;
+  .canvas {
+    justify-content: flex-start;
+    padding: var(--gap-lg);
+    gap: var(--gap-lg);
   }
-}
-
-/* Components Section */
-.components-section {
-  grid-column: 1;
-  grid-row: 1 / 3;
-}
-
-.components-section h2 {
-  margin-top: 0;
 }
 
 .grid-wrapper {
@@ -265,17 +357,21 @@ body[data-theme="dark"] {
   opacity: 0.6;
 }
 
+/* Series flow: blocks laid out in a row, as in the Penpot "RBD Series" board */
 .grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--gap-md);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px var(--gap-md);
   min-height: 200px;
   position: relative;
   z-index: 2;
 }
 
 .topology-badge {
-  grid-column: 1 / -1;
+  flex: 0 0 100%;
   padding: var(--gap-sm) var(--gap-md);
   background-color: rgba(9, 105, 218, 0.05);
   border: 1px solid var(--color-accent-primary);
@@ -286,30 +382,33 @@ body[data-theme="dark"] {
   text-align: center;
 }
 
-/* Component Card */
+/* Component Card - styled as the Penpot "RBD Block" */
 .component-card {
   display: flex;
   flex-direction: column;
   gap: var(--gap-xs);
-  background-color: var(--color-background-base);
-  border: 1px solid var(--color-foreground);
-  border-radius: var(--radius-lg);
-  padding: var(--gap-md);
-  box-shadow: var(--shadow-sm);
+  flex: 0 0 auto;
+  width: 200px;
+  background-color: var(--color-block-bg);
+  border: 1px solid var(--color-block-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
   transition: all 0.2s;
   cursor: pointer;
 }
 
 .component-card:hover {
   border-color: var(--color-accent-primary);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .component-card.is-selected {
-  background-color: var(--color-background-base);
-  border-color: var(--color-foreground);
-  border-width: 1px;
-  box-shadow: 4px 4px 4px rgba(13, 17, 23, 0.4);
+  background-color: var(--color-block-selected-bg);
+  border-color: var(--color-block-border);
+}
+
+.component-card.is-selected .name {
+  font-weight: 600;
 }
 
 .card-header {
@@ -382,25 +481,7 @@ body[data-theme="dark"] {
   outline: none;
 }
 
-/* Reliability Panel */
-.reliability-panel {
-  grid-column: 2;
-  grid-row: 1;
-  background-color: var(--color-background-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--gap-md);
-  box-shadow: var(--shadow-sm);
-  height: fit-content;
-  position: sticky;
-  top: var(--gap-lg);
-}
-
-.reliability-panel h3 {
-  margin-top: 0;
-  margin-bottom: var(--gap-md);
-}
-
+/* Reliability fields */
 .empty-state {
   padding: var(--gap-lg);
   text-align: center;
@@ -449,23 +530,7 @@ body[data-theme="dark"] {
   margin-top: var(--gap-xs);
 }
 
-/* Summary Section */
-.summary-section {
-  grid-column: 2;
-  grid-row: 2;
-  background-color: var(--color-background-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--gap-md);
-  box-shadow: var(--shadow-sm);
-  height: fit-content;
-}
-
-.summary-section h3 {
-  margin-top: 0;
-  margin-bottom: var(--gap-md);
-}
-
+/* System reliability metrics */
 .metric {
   display: flex;
   justify-content: space-between;
